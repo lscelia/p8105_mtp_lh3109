@@ -16,7 +16,6 @@ library(readxl)
 Data Cleaning
 
 ```{r}
-
 data_df =
   #import data
   read_excel("data/p8105_mtp_data.xlsx", range = "A9:I1230") %>% 
@@ -38,7 +37,6 @@ data_df =
     #factor FHP category
     fhp_category = factor(fhp_category, levels = c("0","1","2","3","4"))
     )
-
 ```
 
 
