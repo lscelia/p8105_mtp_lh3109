@@ -44,7 +44,7 @@ data_df =
 ## Problem 2 Visualization
 Figure 3 + 4 improved
 EEOP: exceeded 10mm in size (group 2-5)
-```{r, message = FALSE}
+```{r, message = FALSE, warning = FALSE}
 #remove the variable with labeled "1" in age group
 #did not correct it in part 1
 data_df  = data_df %>%  drop_na(age_group)
@@ -52,10 +52,21 @@ data_df  = data_df %>%  drop_na(age_group)
 #figure 3 improved
 fhp_plot = 
   data_df %>% 
-  select(sex, age_group, fhp_size_mm) %>% 
-  group_by(sex) %>% 
-  ggplot(aes(x = age_group, y = fhp_size_mm, fill = sex)) + 
-  geom_histogram(stat = 'identity', alpha = 0.6)
+  #select the data that will be used in graphing
+  select(sex, age_group, fhp_size_mm) %>%
+  #group data by sex and age group
+  group_by(sex, age_group) %>% 
+  #create plot for the data
+  ggplot(aes(y = fhp_size_mm, x = age_group, color = sex)) + 
+  #create boxplot to show distribution
+  geom_boxplot() +
+  #edit x, y axis labels
+  ylab("FHP Size (mm)") + 
+  xlab("Age Group (years)") +
+  #add title
+  ggtitle("FHP Size (mm) vs. Age Groups (years)") +
+  #move the legend to the bottom
+  theme(legend.position = 'bottom') 
   
   
 #figure 4 improved  
@@ -63,20 +74,36 @@ eeop_plot =
   data_df %>% 
     #group the data frame by three variables respectively
     group_by(age_group, eop_size, sex) %>% 
+    #count the number of eop_size in each group
     count(eop_size) %>% 
+    #group the new dataframe by age group and sex
     group_by(age_group, sex) %>% 
+    #calculate the rate of each group's EOP
     mutate(rate = n / sum(n) * 100) %>% 
-    #
+    #calculate the rate of each group's EEOP
+    #using 100-rate[1]-rate[2] since rate[5] for some group are missing
     summarise(across(rate), rate = 100 - rate[1] - rate[2]) %>%
     #remove duplicate rate by rows
-    distinct(rate) %>% 
+    distinct(rate) %>%
     #plot the data
     ggplot(aes(x = age_group, y = rate, color = sex, group = sex)) +
+    #create line plot with dots
     geom_point() + geom_line() +
     # add x, y axis labels
-    ylab("Rate of EEOP (%)") + xlab("Age Group (years)")
+    ylab("Rate of EEOP (%)") + xlab("Age Group (years)") +
+    #add title to the plot
+    ggtitle("Rate of EEOP (%) vs. Age Groups (years)") +
+    #move the legend to the bottom
+    theme(legend.position = 'bottom')
 
-fhp_plot + eeop_plot
+#combine the two plots in to one
+fhp_plot + eeop_plot +
+  #add title
+  plot_annotation(title = 
+                "Distribution of FHP and EEOP in different Sex and Age Groups",
+                #put the title at center
+                theme = theme(plot.title = 
+                                element_text(hjust = 0.5, face = "bold")))
 ```
 
 
